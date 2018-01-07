@@ -1,3 +1,6 @@
+data "http" "letsencrypt_ca_pem" {
+  url = "https://letsencrypt.org/certs/isrgrootx1.pem.txt"
+}
 
 data "template_file" "cloud-config" {
   template = <<EOF
@@ -8,15 +11,15 @@ write_files:
     - path: "/etc/docker/ca.pem"
       permissions: "0644"
       content: |
-        ${indent(8,file("${path.module}/certs/out/CertAuth.crt"))}
+        ${indent(8,data.http.letsencrypt_ca_pem.body)}
     - path: "/etc/docker/server.pem"
       permissions: "0644"
       content: |
-        ${indent(8,file("${path.module}/certs/out/Docker.crt"))}
+        ${indent(8,acme_certificate.certificate.certificate_pem)}
     - path: "/etc/docker/server-key.pem"
       permissions: "0600"
       content: |
-        ${indent(8,file("${path.module}/certs/out/Docker.key"))}
+        ${indent(8,acme_certificate.certificate.private_key_pem)}
 
 # STEP 2: enable the secure remote API on a new socket
 coreos:

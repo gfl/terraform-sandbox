@@ -23,3 +23,11 @@ resource "aws_route53_record" "www" {
   ttl     = "300"
   records = ["gfl.github.io"]
 }
+
+resource "aws_route53_record" "concourse" {
+  zone_id = "${aws_route53_zone.primary.zone_id}"
+  name    = "concourse.gfl.keytwine.com"
+  type    = "A"
+  ttl     = "300"
+  records = ["${aws_instance.concourse.public_ip}"]
+}
